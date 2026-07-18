@@ -121,9 +121,6 @@ RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_placeholder')
 RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'placeholder_secret')
 RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', 'placeholder_secret')
 
-# Use console-only logging on Vercel (read-only filesystem) and file-logging locally
-is_vercel = os.environ.get('VERCEL') == '1'
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -138,14 +135,9 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': '/tmp/debug.log' if is_vercel else os.path.join(BASE_DIR, 'debug.log'),
-            'formatter': 'verbose',
-        },
     },
     'root': {
-        'handlers': ['console'] if is_vercel else ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
 }
