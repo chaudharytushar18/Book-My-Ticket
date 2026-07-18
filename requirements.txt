@@ -3,7 +3,7 @@ asgiref==3.11.1
 certifi==2026.6.17
 charset-normalizer==3.4.9
 dj-database-url==2.2.0
-Django==3.2.19
+Django==4.2.30
 idna==3.18
 pillow==11.3.0
 psycopg2-binary==2.9.12
