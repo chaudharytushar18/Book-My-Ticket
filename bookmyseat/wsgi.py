@@ -21,12 +21,3 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bookmyseat.settings')
 
 application = get_wsgi_application()
 app = application
-
-# Run database migrations on serverless startup
-if os.environ.get('VERCEL') == '1':
-    try:
-        from django.core.management import call_command
-        call_command('migrate', interactive=False)
-        print("Migrations run successfully on startup.")
-    except Exception as e:
-        print(f"Error running migrations on startup: {e}")
