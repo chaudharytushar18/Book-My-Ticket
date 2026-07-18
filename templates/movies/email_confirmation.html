@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Booking Confirmed - BookMySeat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        .header {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        .body {
+            padding: 30px;
+        }
+        .detail-row {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #e9ecef;
+        }
+        .detail-label {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+        .detail-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #212529;
+        }
+        .footer {
+            background-color: #343a40;
+            color: #ced4da;
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Your Booking is Confirmed!</h2>
+            <p>Thank you for choosing BookMySeat. Present this email at the entry counter.</p>
+        </div>
+        <div class="body">
+            <h3>Ticket Details</h3>
+            <div class="detail-row">
+                <div class="detail-label">Movie</div>
+                <div class="detail-value">{{ movie_name }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Theater</div>
+                <div class="detail-value">{{ theater_name }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Show Timing</div>
+                <div class="detail-value">{{ show_time }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Seats Booked</div>
+                <div class="detail-value">{{ seat_numbers }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Payment ID</div>
+                <div class="detail-value">{{ payment_id }}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Amount Paid</div>
+                <div class="detail-value">Rs. {{ amount }}</div>
+            </div>
+            <p style="color: #6c757d; font-size: 13px; margin-top: 20px;">
+                Note: Standard terms apply. Please arrive at least 15 minutes before showtime.
+            </p>
+        </div>
+        <div class="footer">
+            &copy; 2026 BookMySeat. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<style>
+    .cancel-container {
+        max-width: 550px;
+        margin: 45px auto;
+    }
+    .cancel-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+    }
+    .cancel-icon {
+        color: #dc3545;
+    }
+</style>
+
+<div class="container cancel-container py-5">
+    <div class="card cancel-card p-5 text-center shadow-sm">
+        <i class="fas fa-times-circle fa-5x cancel-icon mb-4"></i>
+        <h3 class="font-weight-bold text-dark mb-2">Payment Cancelled</h3>
+        <p class="text-secondary mb-4">
+            Your transaction was not completed, and your seat reservations have been released. No charges were made.
+        </p>
+        
+        <div class="d-flex justify-content-center">
+            {% if order %}
+            <a href="{% url 'book_seats' order.theater.id %}" class="btn btn-danger btn-lg px-4 font-weight-bold shadow-sm" style="border-radius: 30px;">
+                <i class="fas fa-redo mr-1"></i> Try Selecting Seats Again
+            </a>
+            {% else %}
+            <a href="/" class="btn btn-secondary btn-lg px-4 font-weight-bold shadow-sm" style="border-radius: 30px;">
+                <i class="fas fa-home mr-1"></i> Return Home
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

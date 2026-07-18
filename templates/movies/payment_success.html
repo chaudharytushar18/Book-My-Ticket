@@ -1,0 +1,98 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<style>
+    .receipt-container {
+        max-width: 600px;
+        margin: 45px auto;
+    }
+    .ticket-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: none;
+        overflow: hidden;
+    }
+    .ticket-header {
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 30px 20px;
+        text-align: center;
+    }
+    .ticket-body {
+        padding: 30px;
+        background-image: radial-gradient(circle at 0% 100%, transparent 15px, #f8f9fa 16px), radial-gradient(circle at 100% 100%, transparent 15px, #f8f9fa 16px);
+        background-size: 50% 100%;
+        background-repeat: no-repeat;
+        background-position: left, right;
+        background-color: #fff;
+    }
+    .dashed-divider {
+        border-top: 2px dashed #dee2e6;
+        height: 1px;
+        margin: 25px 0;
+    }
+</style>
+
+<div class="container receipt-container">
+    <div class="card ticket-card">
+        <div class="ticket-header">
+            <i class="fas fa-check-circle fa-4x mb-3"></i>
+            <h3 class="font-weight-bold mb-1">Booking Confirmed!</h3>
+            <p class="mb-0 text-white-50">Your ticket confirmation has been sent to your email.</p>
+        </div>
+
+        <div class="ticket-body">
+            <div class="row">
+                <div class="col-sm-6 mb-3">
+                    <span class="text-muted d-block small text-uppercase">Movie</span>
+                    <strong class="text-dark font-weight-bold" style="font-size: 18px;">{{ booking.movie.name }}</strong>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <span class="text-muted d-block small text-uppercase">Theater</span>
+                    <strong class="text-dark" style="font-size: 16px;">{{ booking.theater.name }}</strong>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <span class="text-muted d-block small text-uppercase">Show Date & Time</span>
+                    <strong class="text-dark">{{ booking.theater.time|date:"D, d M Y | h:i A" }}</strong>
+                </div>
+                <div class="col-sm-6 mb-3">
+                    <span class="text-muted d-block small text-uppercase">Seats Booked</span>
+                    <strong class="text-success" style="font-size: 18px;">
+                        {% if booking_seats %}
+                            {{ booking_seats }}
+                        {% else %}
+                            {{ booking.seat.seat_number }}
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="dashed-divider"></div>
+
+            <div class="row">
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block small text-uppercase">Booking Ref ID</span>
+                    <span class="text-monospace font-weight-bold text-dark">{{ booking.id|stringformat:"06d" }}</span>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block small text-uppercase">Payment ID</span>
+                    <span class="text-monospace text-dark small">{{ booking.payment_intent_id|default:"Paid via Stripe" }}</span>
+                </div>
+                <div class="col-sm-6 mt-3">
+                    <span class="text-muted d-block small text-uppercase">Amount Paid</span>
+                    <strong class="text-dark" style="font-size: 18px;">Rs. {{ total_paid|default:booking.price }}</strong>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="/" class="btn btn-outline-success px-4 font-weight-bold mr-2" style="border-radius: 20px;">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{% url 'profile' %}" class="btn btn-success px-4 font-weight-bold" style="border-radius: 20px;">
+                    <i class="fas fa-user"></i> View Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

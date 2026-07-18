@@ -1,0 +1,137 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<style>
+    .payment-container {
+        max-width: 600px;
+        margin: 40px auto;
+    }
+    .payment-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .timer-badge {
+        font-size: 18px;
+        font-weight: bold;
+        padding: 8px 20px;
+        border-radius: 30px;
+        background-color: #ffeef0;
+        color: #dc3545;
+        border: 1px solid #ffc9cd;
+        display: inline-flex;
+        align-items: center;
+    }
+    .timer-badge i {
+        margin-right: 8px;
+    }
+    .ticket-details {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+    }
+</style>
+
+<div class="container py-4 payment-container">
+    <div class="card payment-card p-4">
+        <div class="text-center mb-4">
+            <h3 class="font-weight-bold text-dark">Confirm Booking</h3>
+            <p class="text-muted">Review your order details and proceed to payment.</p>
+            <div class="timer-badge mt-2">
+                <i class="far fa-clock"></i> Seat lock expires in <span id="countdown">02:00</span>
+            </div>
+        </div>
+
+        <div class="ticket-details mb-4">
+            <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-film text-danger mr-1"></i> Movie & Show</h5>
+            <div class="row">
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block" style="font-size: 12px; text-transform: uppercase;">Movie</span>
+                    <strong class="text-dark">{{ order.theater.movie.name }}</strong>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block" style="font-size: 12px; text-transform: uppercase;">Theater</span>
+                    <strong class="text-dark">{{ order.theater.name }}</strong>
+                </div>
+                <div class="col-sm-12 mb-2">
+                    <span class="text-muted d-block" style="font-size: 12px; text-transform: uppercase;">Show Time</span>
+                    <strong class="text-dark">{{ order.theater.time|date:"D, d M Y | h:i A" }}</strong>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+
+            <h5 class="font-weight-bold text-dark mb-3"><i class="fas fa-couch text-danger mr-1"></i> Seats Selected</h5>
+            <div class="row">
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block" style="font-size: 12px; text-transform: uppercase;">Seats</span>
+                    <strong class="text-dark">
+                        {% for seat in order.seats.all %}
+                        {{ seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </strong>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <span class="text-muted d-block" style="font-size: 12px; text-transform: uppercase;">Ticket Count</span>
+                    <strong class="text-dark">{{ order.seats.count }}</strong>
+                </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-0">Total Amount</h5>
+                    <small class="text-muted">Inclusive of all taxes</small>
+                </div>
+                <h4 class="font-weight-bold text-success mb-0">Rs. {{ order.total_price }}</h4>
+            </div>
+        </div>
+
+        <form action="{% url 'create_checkout_session' order.order_id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" id="pay-btn" class="btn btn-danger btn-block btn-lg font-weight-bold p-3 shadow" style="border-radius: 30px;">
+                <i class="credit-card"></i> Proceed to Pay
+            </button>
+        </form>
+        
+        <div class="text-center mt-3">
+            <a href="{% url 'book_seats' order.theater.id %}" class="text-muted" style="font-size: 13px;"><i class="fas fa-arrow-left"></i> Cancel and select different seats</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 2-minute countdown timer logic
+    var duration = 120; // 2 minutes in seconds
+    var display = document.querySelector('#countdown');
+    var payButton = document.querySelector('#pay-btn');
+    
+    // Check if there is an existing expiration timestamp from server
+    // For simplicity, we just run a client-side 120s timer on page load.
+    // If the server checks it later, it validates against order creation time + 2 mins.
+    var timer = duration, minutes, seconds;
+    var countdownInterval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(countdownInterval);
+            display.textContent = "EXPIRED";
+            payButton.disabled = true;
+            payButton.classList.remove('btn-danger');
+            payButton.classList.add('btn-secondary');
+            payButton.innerHTML = "Session Expired";
+            
+            alert("Your 2-minute seat lock session has expired. Please select seats again.");
+            window.location.href = "{% url 'book_seats' order.theater.id %}";
+        }
+    }, 1000);
+</script>
+{% endblock %}

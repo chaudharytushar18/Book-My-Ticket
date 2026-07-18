@@ -1,0 +1,175 @@
+{% extends "users/basic.html" %} {% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- Movie and Theater Info -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <div
+            class="d-flex justify-content-between align-items-center flex-wrap"
+          >
+            <div>
+              <h4 class="card-title">{{ theaters.movie.name }}</h4>
+              <p class="card-text text-muted">
+                {{ theaters.name }} | {{ theaters.time }}
+              </p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+              <button class="btn btn-outline-primary me-2 mb-2 mb-sm-0">
+                2D
+              </button>
+              <button class="btn btn-outline-primary me-2 mb-2 mb-sm-0">
+                3D
+              </button>
+              <button class="btn btn-outline-primary mb-2 mb-sm-0">
+                IMAX 3D
+              </button>
+              <button class="btn btn-outline-primary mb-2 mb-sm-0">
+                {{seats|length}} Tickets
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seat Selection -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-4">Select Your Seats</h5>
+          <div class="screen">All eyes this way please!</div>
+
+          {% if error %}
+          <div class="alert alert-danger text-center font-weight-bold" role="alert">
+            {{ error }}
+          </div>
+          {% endif %}
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center flex-wrap mb-4" style="max-width: 480px; margin: 0 auto;">
+              {% for seat in seats %}
+              <div class="seat {% if seat.is_unavailable %}sold{% endif %}">
+                {% if not seat.is_unavailable %}
+                <input
+                  type="checkbox"
+                  name="seats"
+                  value="{{ seat.id }}"
+                  class="d-none"
+                  id="seat-{{ seat.id }}"
+                />
+                <label
+                  for="seat-{{ seat.id }}"
+                  class="w-100 h-100 d-flex align-items-center justify-content-center"
+                  >{{ seat.seat_number }}</label
+                >
+                {% else %} 
+                <span class="w-100 h-100 d-flex align-items-center justify-content-center text-muted font-weight-bold">{{ seat.seat_number }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Seat Legend -->
+            <div class="d-flex justify-content-center mb-4">
+              <div class="d-flex align-items-center me-4">
+                <div class="seat" style="background-color: white"></div>
+                <span class="ms-2">Available</span>
+              </div>
+              <div class="d-flex align-items-center me-4">
+                <div class="seat selected"></div>
+                <span class="ms-2">Selected</span>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="seat sold"></div>
+                <span class="ms-2">Sold/Reserved</span>
+              </div>
+            </div>
+
+            <!-- Book Button -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-success btn-lg px-5 font-weight-bold" style="border-radius: 30px;">
+                Lock Seats & Pay
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+  }
+  .seat {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #28a745;
+    margin: 4px;
+    text-align: center;
+    line-height: 35px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    user-select: none;
+  }
+  .seat label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .seat:hover:not(.sold) {
+    background-color: #28a745;
+    color: white;
+  }
+  .seat.selected {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+  }
+  .seat.sold {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    cursor: not-allowed;
+  }
+  .screen {
+    margin: 20px 0 40px 0;
+    background-color: #ced4da;
+    height: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    line-height: 50px;
+    color: #6c757d;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+  $(document).ready(function() {
+    // Check/uncheck seat checkbox when clicking any part of the seat wrapper div
+    $('.seat').on('click', function(e) {
+      if ($(e.target).is('input') || $(e.target).is('label')) {
+        return;
+      }
+      var checkbox = $(this).find('input[type="checkbox"]');
+      if (checkbox.length) {
+        checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+      }
+    });
+
+    // Add selected class visually to seat wrapper when checkbox changes
+    $('.seat input[type="checkbox"]').on('change', function() {
+      if ($(this).is(':checked')) {
+        $(this).closest('.seat').addClass('selected');
+      } else {
+        $(this).closest('.seat').removeClass('selected');
+      }
+    });
+  });
+</script>
+{% endblock %}

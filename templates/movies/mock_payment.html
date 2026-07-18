@@ -1,0 +1,60 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<style>
+    .mock-container {
+        max-width: 550px;
+        margin: 40px auto;
+    }
+    .mock-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background: #ffffff;
+    }
+    .payment-options button {
+        margin: 10px 0;
+    }
+</style>
+
+<div class="container py-5 mock-container">
+    <div class="card mock-card p-4">
+        <div class="text-center mb-4">
+            <span class="badge badge-warning mb-2 px-3 py-2 text-uppercase font-weight-bold">Simulated Sandbox</span>
+            <h3 class="font-weight-bold text-dark"><i class="fas fa-credit-card text-danger"></i> Mock Payment Gateway</h3>
+            <p class="text-muted mb-0">Local simulation of payment responses to bypass live gateway API requirements.</p>
+        </div>
+
+        <div class="border rounded p-3 bg-light mb-4">
+            <h6 class="font-weight-bold mb-2">Order Summary</h6>
+            <div class="d-flex justify-content-between mb-1">
+                <span>Order ID:</span>
+                <strong>{{ order.order_id }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+                <span>Tickets:</span>
+                <strong>{{ order.seats.count }} Seats ({{ seat_numbers }})</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span>Total Charge:</span>
+                <strong class="text-success">Rs. {{ order.total_price }}</strong>
+            </div>
+        </div>
+
+        <div class="payment-options">
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" name="status" value="success" class="btn btn-success btn-block btn-lg p-3 font-weight-bold" style="border-radius: 30px;">
+                    <i class="fas fa-check-circle mr-1"></i> Simulate Successful Payment (Success Webhook)
+                </button>
+                <button type="submit" name="status" value="failure" class="btn btn-danger btn-block btn-lg p-3 font-weight-bold" style="border-radius: 30px;">
+                    <i class="fas fa-times-circle mr-1"></i> Simulate Failed Payment (Failure Webhook)
+                </button>
+            </form>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'book_seats' order.theater.id %}" class="text-muted" style="font-size: 13px;">Cancel simulation</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

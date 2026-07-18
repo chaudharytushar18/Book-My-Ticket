@@ -1,0 +1,50 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<div class="container text-center py-5">
+    <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;">
+        <span class="sr-only">Loading...</span>
+    </div>
+    <h4 class="font-weight-bold text-dark mt-4">Connecting to Razorpay Secure Gateway...</h4>
+    <p class="text-muted">Please do not close this window or refresh the page.</p>
+
+    <!-- Razorpay Checkout JavaScript overlay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ order_amount }}",
+            "currency": "INR",
+            "name": "BookMySeat Platform",
+            "description": "Ticket Booking Order #{{ order.order_id }}",
+            "order_id": "{{ razorpay_order_id }}",
+            "handler": function (response){
+                // On successful authorization, send credentials back to success view for signature check
+                window.location.href = "{% url 'payment_success' %}?razorpay_payment_id=" + 
+                                       response.razorpay_payment_id + 
+                                       "&razorpay_order_id=" + response.razorpay_order_id + 
+                                       "&razorpay_signature=" + response.razorpay_signature + 
+                                       "&order_id={{ order.order_id }}";
+            },
+            "modal": {
+                "ondismiss": function(){
+                    // User closed the window, redirect to cancellation page
+                    window.location.href = "{% url 'payment_cancel' %}?order_id={{ order.order_id }}";
+                }
+            },
+            "prefill": {
+                "name": "{{ user_name }}",
+                "email": "{{ user_email }}"
+            },
+            "theme": {
+                "color": "#dc3545"
+            }
+        };
+        var rzp = new Razorpay(options);
+        
+        // Open the Razorpay payment UI automatically on load
+        window.onload = function() {
+            rzp.open();
+        };
+    </script>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "users/basic.html" %}
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 1100px;
+        margin: 40px auto;
+    }
+    .metric-card {
+        border: none;
+        border-radius: 12px;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+    }
+    .bg-revenue-daily { background: linear-gradient(135deg, #157347, #198754); }
+    .bg-revenue-weekly { background: linear-gradient(135deg, #0b5ed7, #0d6efd); }
+    .bg-revenue-monthly { background: linear-gradient(135deg, #6f42c1, #593196); }
+    .bg-cancellation { background: linear-gradient(135deg, #bb2d3b, #dc3545); }
+    
+    .dashboard-section {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+        border: none;
+    }
+</style>
+
+<div class="container py-4 dashboard-container">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <div>
+            <h2 class="font-weight-bold text-dark mb-1"><i class="fas fa-chart-pie text-danger"></i> Admin Analytics Dashboard</h2>
+            <p class="text-muted">Real-time optimized business metrics with database-level aggregation.</p>
+        </div>
+        <div class="badge badge-success p-2 font-weight-bold" style="font-size: 13px;">
+            <i class="fas fa-check-circle"></i> Caching Active (5m TTL)
+        </div>
+    </div>
+
+    <!-- Revenue & Cancellation Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-revenue-daily p-3">
+                <div class="card-body">
+                    <span class="d-block text-white-50 text-uppercase small font-weight-bold">Daily Revenue</span>
+                    <h3 class="font-weight-bold mt-2">Rs. {{ daily_revenue }}</h3>
+                    <small class="text-white-50"><i class="fas fa-calendar-day"></i> Past 24 hours</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-revenue-weekly p-3">
+                <div class="card-body">
+                    <span class="d-block text-white-50 text-uppercase small font-weight-bold">Weekly Revenue</span>
+                    <h3 class="font-weight-bold mt-2">Rs. {{ weekly_revenue }}</h3>
+                    <small class="text-white-50"><i class="fas fa-calendar-week"></i> Current week</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-revenue-monthly p-3">
+                <div class="card-body">
+                    <span class="d-block text-white-50 text-uppercase small font-weight-bold">Monthly Revenue</span>
+                    <h3 class="font-weight-bold mt-2">Rs. {{ monthly_revenue }}</h3>
+                    <small class="text-white-50"><i class="fas fa-calendar-alt"></i> Current month</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card metric-card bg-cancellation p-3">
+                <div class="card-body">
+                    <span class="d-block text-white-50 text-uppercase small font-weight-bold">Cancellation Rate</span>
+                    <h3 class="font-weight-bold mt-2">{{ cancellation_rate }}%</h3>
+                    <small class="text-white-50"><i class="fas fa-ban"></i> Total bookings: {{ total_bookings }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Analytics Content -->
+    <div class="row">
+        <!-- Most Popular Movies & Busiest Theaters -->
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-section p-4 h-100">
+                <h5 class="font-weight-bold text-dark mb-4"><i class="fas fa-fire text-danger mr-1"></i> Most Popular Movies</h5>
+                {% if popular_movies %}
+                <ul class="list-group list-group-flush">
+                    {% for movie in popular_movies %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-light px-0">
+                        <div class="d-flex align-items-center">
+                            <span class="badge badge-danger mr-3 font-weight-bold" style="border-radius: 50%; width: 25px; height: 25px; line-height: 18px; text-align: center;">{{ forloop.counter }}</span>
+                            <span class="font-weight-bold text-secondary">{{ movie.name }}</span>
+                        </div>
+                        <span class="badge badge-light border text-dark font-weight-bold">{{ movie.booking_count }} Bookings</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-folder-open fa-2x mb-2"></i>
+                    <p class="mb-0">No movie booking data available.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-section p-4 h-100">
+                <h5 class="font-weight-bold text-dark mb-4"><i class="fas fa-percentage text-danger mr-1"></i> Busiest Theaters (Occupancy Rate)</h5>
+                {% if busiest_theaters %}
+                <div>
+                    {% for theater in busiest_theaters %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="font-weight-bold text-secondary">{{ theater.name }} Theater</span>
+                            <span class="text-dark font-weight-bold">{{ theater.occupancy_rate|stringformat:".1f" }}%</span>
+                        </div>
+                        <div class="progress" style="height: 10px; border-radius: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ theater.occupancy_rate }}%" aria-valuenow="{{ theater.occupancy_rate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted">{{ theater.booked_seats }} booked out of {{ theater.total_seats }} seats</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-door-closed fa-2x mb-2"></i>
+                    <p class="mb-0">No theater scheduling data available.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Peak Booking Hours -->
+        <div class="col-12 mt-2">
+            <div class="card dashboard-section p-4">
+                <h5 class="font-weight-bold text-dark mb-4"><i class="fas fa-clock text-danger mr-1"></i> Peak Booking Hours</h5>
+                {% if peak_hours %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Hour of Day</th>
+                                <th scope="col">Simulated Time Slot</th>
+                                <th scope="col">Bookings Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hour in peak_hours %}
+                            <tr>
+                                <td class="font-weight-bold">{{ hour.hour }}:00</td>
+                                <td>
+                                    {% if hour.hour < 12 %}
+                                        {{ hour.hour }} AM
+                                    {% elif hour.hour == 12 %}
+                                        12 PM (Noon)
+                                    {% else %}
+                                        {{ hour.hour|add:"-12" }} PM
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-info p-2 font-weight-bold">{{ hour.count }} tickets purchased</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <p class="mb-0">No booking hourly data recorded yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
